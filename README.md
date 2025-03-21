@@ -13,4 +13,4 @@ This project for "Introduction to SQL" , This course is part of "Programming for
 - Run the sql queries in udacity database in workspace of course
 
 ## LICENCE
-[License](LICENSE.txt)
+[License](LICENSE)
