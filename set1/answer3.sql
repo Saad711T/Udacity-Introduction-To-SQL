@@ -1,4 +1,4 @@
-WITH table1
+WITH t2
 AS (SELECT
   c.name,
   f.rental_duration,
@@ -17,7 +17,7 @@ SELECT
   name,
   standard_quartile,
   COUNT(standard_quartile)
-FROM table1
+FROM t2
 
 GROUP BY 1,
          2
