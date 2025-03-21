@@ -1,4 +1,4 @@
-WITH T1 AS (
+WITH t1 AS (
     SELECT 
         c.customer_id,
         c.first_name || ' ' || c.last_name AS fullname,
@@ -20,7 +20,7 @@ WITH T1 AS (
         customer_id,
         SUM(total_monthly_payment) AS total_yearly_payment
     FROM 
-        T1
+        t1
     GROUP BY 
         customer_id
     ORDER BY 
@@ -34,7 +34,7 @@ SELECT
     COUNT(*) AS number_of_payments,
     SUM(cp.total_monthly_payment) AS total_monthly_amount
 FROM 
-    T1 cp
+    t1 cp
 JOIN 
     TopCustomers tc ON cp.customer_id = tc.customer_id
 GROUP BY 
