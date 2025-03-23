@@ -1,0 +1,116 @@
+/*Q1-Set 1 :
+We want to understand more about the movies that families are watching. The following categories are considered family movies: Animation, Children, Classics, Comedy, Family, and Music.
+1-Create a query that lists each movie, the film category it is classified in, and the number of times it has been rented out.
+
+ANSWER :
+*/
+
+select 
+    f.title AS Movie,
+    c.name AS Category,
+    COUNT(r.rental_id) AS Rental_Count
+from
+    film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE
+    c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+GROUP BY
+    f.title, c.name
+ORDER BY
+    c.name, f.title;
+
+
+/*
+Q2-Set 1 :
+Now we need to know how the length of rental duration of these family-friendly movies compares to 
+the duration that all movies are rented for. Can you provide a table with the movie titles and divide them into 
+4 levels (first_quarter, second_quarter, third_quarter, and final_quarter) 
+based on the quartiles (25%, 50%, 75%) of the average rental duration(in the number of days) for movies across
+all categories? Make sure to also indicate the category that these family-friendly movies fall into.
+
+ANSWER :
+*/
+WITH t1 AS
+(SELECT *
+FROM category c
+    JOIN film_category fc
+ON c.category_id = fc.category_id
+    JOIN film f
+ON f.film_id = fc.film_id
+    WHERE c.name IN ('Animation', 'Children','Classics','Comedy','Family','Music') )
+
+SELECT t1.name, t1.title,
+t1.rental_duration,
+      NTILE(4) OVER (ORDER BY rental_duration) AS standard_quartile
+FROM t1
+ORDER BY standard_quartile
+
+/*
+Q3-Set 1 :
+Question 3
+Finally, provide a table with the family-friendly film category, each of the quartiles,
+ and the corresponding count of movies within each combination of film category for each corresponding rental duration category.
+The resulting table should have three columns:
+-Category
+-Rental length category
+-Count
+
+ANSWER :
+*/
+
+WITH t2
+AS (SELECT
+  c.name,
+  f.rental_duration,
+  NTILE(4) OVER (ORDER BY f.rental_duration) AS standard_quartile
+
+FROM category AS c
+JOIN film_category AS fc
+  ON c.category_id = fc.category_id
+
+JOIN film AS f
+  ON fc.film_id = f.film_id
+
+WHERE c.name IN ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music'))
+
+SELECT
+  name,
+  standard_quartile,
+  COUNT(standard_quartile)
+FROM t2
+
+GROUP BY 1,
+         2
+ORDER BY 1, 2;
+
+
+/*
+Q1-Set 2 :
+Question 1:
+We want to find out how the two stores compare in their count of rental orders during every month for
+all the years we have data for. ** **
+
+Write a query that returns the store ID for the store, the year and month and the number of rental orders each store has fulfilled
+for that month. Your table should include a column for each of the following: year, month,
+store ID and count of rental orders fulfilled during that month.
+
+ANSWER :
+*/
+SELECT 
+    EXTRACT(YEAR FROM r.rental_date) AS rental_year, 
+    EXTRACT(MONTH FROM r.rental_date) AS rental_month, 
+    s.store_id,
+    COUNT(r.rental_id) AS count_rentals
+FROM  
+    rental r
+JOIN 
+    inventory i ON r.inventory_id = i.inventory_id
+JOIN 
+    store s ON i.store_id = s.store_id
+GROUP BY 
+    rental_year, rental_month, s.store_id
+ORDER BY 
+    rental_year, rental_month, s.store_id;
